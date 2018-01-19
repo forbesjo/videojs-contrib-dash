@@ -1,4 +1,5 @@
 import window from 'global/window';
+import document from 'global/document';
 import videojs from 'video.js';
 import dashjs from 'dashjs';
 import setupAudioTracks from './setup-audio-tracks';
@@ -42,7 +43,8 @@ class Html5DashJS {
       source = hook(source);
     });
 
-    let manifestSource = source.src;
+    const manifestSource = source.src;
+
     this.keySystemOptions_ = Html5DashJS.buildDashJSProtData(source.keySystemOptions);
 
     this.player.dash.mediaPlayer = dashjs.MediaPlayer().create();
@@ -78,7 +80,7 @@ class Html5DashJS {
 
         if (this.mediaPlayer_.hasOwnProperty(dashOptionsKey)) {
           // Providing a key without `set` prefix is now deprecated.
-          videojs.log.warn(`Using dash options in videojs-contrib-dash without the set prefix ` +
+          videojs.log.warn('Using dash options in videojs-contrib-dash without the set prefix ' +
             `has been deprecated. Change '${key}' to '${dashOptionsKey}'`);
 
           // Set key so it will still work
@@ -127,15 +129,15 @@ class Html5DashJS {
    * Also rename 'licenseUrl' property in the options to an 'serverURL' property
    */
   static buildDashJSProtData(keySystemOptions) {
-    let output = {};
+    const output = {};
 
     if (!keySystemOptions || !Array.isArray(keySystemOptions)) {
       return null;
     }
 
     for (let i = 0; i < keySystemOptions.length; i++) {
-      let keySystem = keySystemOptions[i];
-      let options = videojs.mergeOptions({}, keySystem.options);
+      const keySystem = keySystemOptions[i];
+      const options = videojs.mergeOptions({}, keySystem.options);
 
       if (options.licenseUrl) {
         options.serverURL = options.licenseUrl;
@@ -160,6 +162,7 @@ class Html5DashJS {
 
   duration() {
     const duration = this.el_.duration;
+
     if (duration === Number.MAX_VALUE) {
       return Infinity;
     }
@@ -234,9 +237,10 @@ const canHandleKeySystems = function(source) {
     source = hook(source);
   });
 
-  let videoEl = document.createElement('video');
+  const videoEl = document.createElement('video');
+
   if (source.keySystemOptions &&
-    !(navigator.requestMediaKeySystemAccess ||
+    !(window.navigator.requestMediaKeySystemAccess ||
       // IE11 Win 8.1
       videoEl.msSetMediaKeys)) {
     return false;
@@ -247,8 +251,8 @@ const canHandleKeySystems = function(source) {
 
 videojs.DashSourceHandler = function() {
   return {
-    canHandleSource: function(source) {
-      let dashExtRE = /\.mpd/i;
+    canHandleSource(source) {
+      const dashExtRE = /\.mpd/i;
 
       if (!canHandleKeySystems(source)) {
         return '';
@@ -258,23 +262,24 @@ videojs.DashSourceHandler = function() {
         return 'probably';
       } else if (dashExtRE.test(source.src)) {
         return 'maybe';
-      } else {
-        return '';
       }
+
+      return '';
     },
 
-    handleSource: function(source, tech, options) {
+    handleSource(source, tech, options) {
       return new Html5DashJS(source, tech, options);
     },
 
-    canPlayType: function(type) {
+    canPlayType(type) {
       return videojs.DashSourceHandler.canPlayType(type);
     }
   };
 };
 
 videojs.DashSourceHandler.canPlayType = function(type) {
-  let dashTypeRE = /^application\/dash\+xml/i;
+  const dashTypeRE = /^application\/dash\+xml/i;
+
   if (dashTypeRE.test(type)) {
     return 'probably';
   }
@@ -283,7 +288,7 @@ videojs.DashSourceHandler.canPlayType = function(type) {
 };
 
 // Only add the SourceHandler if the browser supports MediaSourceExtensions
-if (!!window.MediaSource) {
+if (window.MediaSource) {
   videojs.getTech('Html5').registerSourceHandler(videojs.DashSourceHandler(), 0);
 }
 

@@ -1,8 +1,9 @@
+import window from 'global/window';
 import dashjs from 'dashjs';
 import videojs from 'video.js';
 
 function find(l, f) {
-  for(let i = 0; i < l.length; i++) {
+  for (let i = 0; i < l.length; i++) {
     if (f(l[i])) {
       return l[i];
     }
@@ -29,13 +30,14 @@ function attachDashTextTracksToVideojs(player, tech, tracks) {
       trackConfig: {
         label: track.lang,
         language: track.lang,
-        srclang: track.lang,
-      },
+        srclang: track.lang
+      }
     }))
 
     // Add track to videojs track list
     .map(({trackConfig, dashTrack}) => {
       const remoteTextTrack = player.addRemoteTextTrack(trackConfig, true);
+
       trackDictionary.push({textTrack: remoteTextTrack.track, dashTrack});
 
       // Don't add the cues becuase we're going to let dash handle it natively. This will ensure

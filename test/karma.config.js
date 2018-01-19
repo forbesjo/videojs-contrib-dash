@@ -1,48 +1,53 @@
+var babel = require('rollup-plugin-babel');
+var commonjs = require('rollup-plugin-commonjs');
+var json = require('rollup-plugin-json');
+var multiEntry = require('rollup-plugin-multi-entry');
+var resolve = require('rollup-plugin-node-resolve');
+
 module.exports = function(config) {
-
-  // On Travis CI, we can only run in Chrome.
-  if (process.env.TRAVIS) {
-    config.browsers = ['travisChrome'];
-  }
-
-  if (!config.browsers.length) {
-    config.browsers = ['Chrome', 'Firefox'];
-  }
-
   config.set({
     basePath: '..',
     frameworks: ['qunit'],
-
-    files: [
-      'node_modules/video.js/dist/video-js.css',
-      'node_modules/video.js/dist/video.js',
-      'node_modules/dashjs/dist/dash.all.debug.js',
-      'dist/videojs-dash.js',
-      'test/integration.test.js',
-      'test/globals.test.js',
-      'test/dashjs.test.js',
-      'dist-test/browserify.test.js',
-      'dist-test/webpack.test.js'
-    ],
-    customLaunchers: {
-      travisChrome: {
-        base: 'Chrome',
-        flags: ['--no-sandbox']
+    browsers: ['ChromeHeadless'],
+    client: {
+      clearContext: false,
+      qunit: {
+        showUI: true,
+        testTimeout: 5000
       }
     },
-    reporters: ['spec'],
+    files: [{
+      included: false,
+      pattern: 'src/**/*.js',
+      watched: true
+    }, {
+      pattern: 'test/**/*.test.js',
+      // Make sure to disable Karma’s file watcher
+      // because the preprocessor will use its own.
+      watched: false
+    }],
+    reporters: ['dots'],
     port: 9876,
     colors: true,
     autoWatch: false,
     singleRun: true,
-    concurrency: 1,
+    concurrency: Infinity,
+    preprocessors: {
+      'test/**/*.test.js': ['rollup']
+    },
 
-    browserDisconnectTolerance: 3,
-    captureTimeout: 300000,
-    browserNoActivityTimeout: 300000,
-    browserConsoleLogOptions: {
-      level: 'error',
-      terminal: false
+    rollupPreprocessor: {
+      name: 'videojsContribDashTest',
+      format: 'iife',
+      external: [ 'qunit' ],
+      globals: { qunit: 'QUnit' },
+      plugins: [
+        multiEntry({ exports: false }),
+        resolve({ browser: true, main: true, jsnext: true }),
+        json(),
+        commonjs({ sourceMap: false }),
+        babel({exclude: 'node_modules/**'})
+      ]
     }
   });
 };

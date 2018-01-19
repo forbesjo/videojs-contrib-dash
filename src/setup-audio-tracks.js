@@ -48,7 +48,7 @@ function handlePlaybackMetadataLoaded(player, tech) {
         id: generateIdFromTrackIndex(dashTrack.index),
         kind: dashTrack.kind || 'main',
         label,
-        language: dashTrack.lang,
+        language: dashTrack.lang
       })
     );
   });
@@ -60,7 +60,6 @@ function handlePlaybackMetadataLoaded(player, tech) {
       if (track.enabled) {
         // Find the audio track we just selected by the id
         const dashAudioTrack = findDashAudioTrack(dashAudioTracks, track);
-
 
         // Set is as the current track
         mediaPlayer.setCurrentTrack(dashAudioTrack);

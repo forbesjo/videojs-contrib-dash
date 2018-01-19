@@ -1,12 +1,13 @@
-(function(window, videojs, q) {
-  'use strict';
+import window from 'global/window';
+import videojs from 'video.js';
+import '../src';
+import QUnit from 'qunit';
 
-  q.module('videojs-dash globals');
+QUnit.module('videojs-dash globals');
 
-  q.test('has expected globals', function(assert) {
-    assert.ok(videojs.Html5DashJS, 'videojs has "Html5Dash" property');
-    assert.ok(window.dashjs, 'global has "dashjs" property');
-    assert.ok(window.dashjs.MediaPlayer, 'global has "dashjs.MediaPlayer" property');
-  });
+QUnit.test('has expected globals', function(assert) {
+  assert.ok(videojs.Html5DashJS, 'videojs has "Html5Dash" property');
+  assert.ok(window.dashjs, 'global has "dashjs" property');
+  assert.ok(window.dashjs.MediaPlayer, 'global has "dashjs.MediaPlayer" property');
+});
 
-})(window, window.videojs, window.QUnit);
